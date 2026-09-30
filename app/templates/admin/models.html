@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block title %}Product models | Morrow admin{% endblock %}
+{% block content %}
+<section class="page-heading compact-heading"><p class="eyebrow">Market administration</p><h1>Product 3D models</h1><p>Review active models, upload a new version, or return a product to its photo view.</p></section>
+<section class="section admin-models-list">
+  {% for product in page.items %}
+  <article class="admin-model-row"><div class="admin-model-product"><strong>{{ product.name }}</strong><small>{{ product.shop.name }} · {{ product.status }}</small></div>
+    <div class="admin-model-status">{% if product.has_3d and product.model_3d_url %}<span class="status-pill status-approved">3D · {{ product.model_3d_type|upper }}</span>{% if product.models_3d %}<small>{{ '{:.1f}'.format(product.models_3d[0].file_size / 1048576) }} MB</small>{% endif %}{% else %}<span class="muted-copy">Photo gallery</span>{% endif %}</div>
+    <details class="admin-model-controls"><summary>Manage model</summary>
+      <form class="model-upload-form" method="post" enctype="multipart/form-data" action="{{ url_for('seller.upload_3d_model', product_id=product.id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><label>GLB or self-contained glTF<input type="file" name="model_3d_file" accept=".glb,.gltf,model/gltf-binary,model/gltf+json" required data-model-file><small>Maximum 50 MB. A new upload becomes the active version.</small></label><button class="button button-dark button-small" type="submit">Upload model</button><span class="model-upload-feedback" data-model-upload-feedback aria-live="polite"></span></form>
+      {% if product.has_3d %}<form method="post" action="{{ url_for('seller.remove_3d_model', product_id=product.id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="button button-outline button-small" type="submit">Remove active model</button></form>{% endif %}
+    </details>
+  </article>
+  {% else %}<p class="muted-copy">No products in the catalog.</p>{% endfor %}
+  {% if page.pages > 1 %}<nav class="pagination">{% if page.has_prev %}<a href="{{ url_for('admin.models', page=page.prev_num) }}">← Previous</a>{% endif %}<span>Page {{ page.page }} of {{ page.pages }}</span>{% if page.has_next %}<a href="{{ url_for('admin.models', page=page.next_num) }}">Next →</a>{% endif %}</nav>{% endif %}
+</section>
+<script src="{{ url_for('static', filename='js/seller.js') }}" defer></script>
+{% endblock %}

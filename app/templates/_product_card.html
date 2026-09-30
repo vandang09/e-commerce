@@ -1,0 +1,18 @@
+<article class="product-card">
+  <div class="product-image-wrap">
+    <a href="{{ url_for('storefront.product_detail', slug=product.slug) }}" class="product-image-link">
+      <img src="{{ product.image_url or 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=900&q=85' }}" alt="{{ product.name }}" loading="lazy">
+    </a>
+    <span class="image-tag">{{ product.category.name }}</span>
+    {% if product.has_3d %}<span class="product-3d-card-badge">3D VIEW</span>{% endif %}
+    {% if product.rotation_images|length >= 24 %}<span class="product-spin-badge">↻ 360°</span>{% endif %}
+    {% if current_user.is_authenticated %}<button class="heart-button" type="button" data-wishlist="{{ product.id }}" aria-label="Save {{ product.name }}">♡</button>{% endif %}
+  </div>
+  <div class="product-info">
+    <a class="product-name" href="{{ url_for('storefront.product_detail', slug=product.slug) }}">{{ product.name }}</a>
+    <a class="shop-name" href="{{ url_for('storefront.shop_detail', slug=product.shop.slug) }}">{{ product.shop.name }}</a>
+    <div class="product-meta"><span class="rating">★ 4.8</span><span>{{ product.sold_count }} sold</span></div>
+    <div class="product-price">₫{{ '{:,.0f}'.format(product.price) }}</div>
+    <button class="quick-add" type="button" data-add-cart="{{ product.id }}" {% if product.stock < 1 %}disabled{% endif %}>{% if product.stock %}+ Add to bag{% else %}Sold out{% endif %}</button>
+  </div>
+</article>

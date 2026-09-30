@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Discover thoughtful everyday finds from independent shops at Morrow Market.">
+  <meta property="og:title" content="Morrow Market | Good things, gathered well">
+  <meta property="og:description" content="A considered marketplace for useful, well-made things.">
+  <title>{% block title %}Morrow Market | Good things, gathered well{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <meta name="csrf-token" content="{{ csrf_token() }}">
+  <script>try{document.documentElement.dataset.theme=localStorage.getItem('morrow-theme')||'light'}catch(error){document.documentElement.dataset.theme='light'}</script>
+  <script src="{{ url_for('static', filename='js/main.js') }}" defer></script>
+</head>
+<body>
+  <div class="header-shell">
+  <div class="announcement">A little more delight in the everyday <span>·</span> Free delivery over ₫500,000</div>
+  <header class="site-header">
+    <a class="wordmark" href="{{ url_for('storefront.home') }}"><span class="brand-mark">m</span> morrow<span class="wordmark-light">market</span></a>
+    <form class="search" action="{{ url_for('storefront.products') }}" method="get" role="search">
+      <span aria-hidden="true">⌕</span><input name="q" value="{{ request.args.get('q', '') }}" placeholder="Find something lovely..." aria-label="Search products"><button type="submit">Search</button>
+    </form>
+    <nav class="header-actions" aria-label="Account navigation">
+      <a class="icon-link" href="{{ url_for('commerce.wishlist') if current_user.is_authenticated else url_for('auth.login') }}" title="Wishlist">♡</a>
+      <a class="icon-link cart-link" href="{{ url_for('commerce.cart') }}" title="Shopping bag">Bag <span id="cart-count">{{ cart_count }}</span></a>
+      <button class="theme-toggle" type="button" data-theme-toggle aria-label="Switch to dark theme" title="Switch theme">◐</button>
+      {% if current_user.is_authenticated %}
+        <a class="account-link" href="{{ url_for('seller.dashboard') if current_user.role == 'seller' else url_for('admin.dashboard') if current_user.role == 'admin' else url_for('commerce.orders') }}">{{ current_user.full_name or current_user.username }}</a>
+        <form action="{{ url_for('auth.logout') }}" method="post" class="inline-form"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="text-button" type="submit">Log out</button></form>
+      {% else %}
+        <a class="account-link" href="{{ url_for('auth.login') }}">Log in</a><a class="join-link" href="{{ url_for('auth.register') }}">Join us</a>
+      {% endif %}
+      <button class="menu-toggle" type="button" aria-label="Toggle categories" aria-expanded="false">☰</button>
+    </nav>
+  </header>
+  <nav class="category-nav" aria-label="Shop categories">
+    <a href="{{ url_for('storefront.products') }}">Explore all</a>
+    <a href="{{ url_for('storefront.products', sort='popular') }}">Bestsellers</a>
+    <a href="{{ url_for('storefront.products', sort='newest') }}">New arrivals</a>
+    {% for category in nav_categories %}<a href="{{ url_for('storefront.products', category=category.slug) }}"><span>{{ category.icon }}</span> {{ category.name }}</a>{% endfor %}
+    {% if current_user.is_authenticated and current_user.role in ['seller', 'admin'] %}<a href="{{ url_for('seller.products') }}">Seller studio</a>{% endif %}
+  </nav>
+  </div>
+  <main>
+    <div class="toast-stack" id="toast-stack" aria-live="polite">
+      {% with messages = get_flashed_messages(with_categories=true) %}{% for category, message in messages %}<div class="toast toast-{{ category }}">{{ message }}</div>{% endfor %}{% endwith %}
+    </div>
+    {% block content %}{% endblock %}
+  </main>
+  <dialog class="confirm-dialog" id="confirm-dialog" aria-labelledby="confirm-title">
+    <form method="dialog" class="confirm-dialog-inner"><button class="dialog-close" value="cancel" aria-label="Close">×</button><p class="eyebrow">One last check</p><h2 id="confirm-title">Remove this from your bag?</h2><p class="muted-copy">You can always find it again in the shop.</p><div class="dialog-actions"><button class="button button-outline" value="cancel">Keep it</button><button class="button button-dark" value="confirm">Remove item</button></div></form>
+  </dialog>
+  <footer class="site-footer">
+    <div class="footer-brand"><a class="wordmark" href="{{ url_for('storefront.home') }}"><span class="brand-mark">m</span> morrow<span class="wordmark-light">market</span></a><p>Good things, gathered well.</p></div>
+    <div><strong>Discover</strong><a href="{{ url_for('storefront.products') }}">All finds</a><a href="{{ url_for('storefront.products', sort='popular') }}">Bestsellers</a><a href="{{ url_for('storefront.products', sort='newest') }}">New arrivals</a></div>
+    <div><strong>Your account</strong><a href="{{ url_for('commerce.orders') }}">Orders</a><a href="{{ url_for('commerce.wishlist') }}">Wishlist</a><a href="{{ url_for('auth.register') }}">Join Morrow</a></div>
+    <div><strong>Our promise</strong><p>Independent shops. Useful objects. A brighter everyday.</p><a href="{{ url_for('storefront.products') }}">Find your next favorite ↗</a></div>
+    <div class="footer-bottom">© 2026 Morrow Market <span>Privacy · Terms · Made for the things you keep.</span></div>
+  </footer>
+</body>
+</html>

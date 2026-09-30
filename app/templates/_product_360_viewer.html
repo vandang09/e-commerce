@@ -1,0 +1,27 @@
+{% if product.has_3d and product.model_3d_url %}
+<div class="product-viewer product-viewer-3d" data-product-viewer>
+  <div class="viewer-modes" role="tablist" aria-label="Product view mode"><button class="viewer-mode" type="button" role="tab" aria-selected="false" data-view-mode="image">Photos</button><button class="viewer-mode is-active" type="button" role="tab" aria-selected="true" data-view-mode="three">3D showroom</button></div>
+  <div class="viewer-panel image-panel" data-view-panel="image" hidden><img src="{{ product.image_url }}" alt="{{ product.name }}" fetchpriority="high"></div>
+  <div class="viewer-panel three-panel" data-view-panel="three"><div class="three-stage" data-three-stage>
+    <canvas class="three-canvas" tabindex="0" role="img" aria-label="Interactive 3D model of {{ product.name }}" data-three-canvas></canvas>
+    <div class="three-loading" data-three-loading role="status"><span data-three-loading-text>Preparing 3D showroom</span><progress max="100" value="0" data-three-progress></progress><small data-three-progress-label>0%</small></div>
+    <div class="three-error" data-three-error hidden role="alert"><strong>3D viewer unavailable</strong><span data-three-error-text>The model could not be displayed.</span><button class="button button-outline button-small" type="button" data-error-photos>View product photos</button></div>
+    <div class="three-hint" data-three-hint><span>↔</span> Drag to rotate <i>·</i> Scroll to zoom <i>·</i> Right-drag to pan</div>
+    <div class="three-toolbar" aria-label="3D viewer controls"><button type="button" data-three-reset title="Reset view" aria-label="Reset camera">↻ <span>Reset</span></button><button type="button" data-three-auto title="Auto rotate" aria-label="Start automatic rotation" aria-pressed="false">▶ <span>Auto</span></button><button type="button" data-three-fullscreen title="Fullscreen" aria-label="Enter fullscreen">⛶ <span>Full</span></button><button type="button" data-three-settings title="Viewer settings" aria-label="Open viewer settings" aria-expanded="false">⚙ <span>Settings</span></button></div>
+    <aside class="three-settings" data-three-settings-panel hidden aria-label="Viewer settings"><label>Lighting<select data-three-lighting><option value="studio">Studio</option><option value="daylight">Soft daylight</option></select></label><label>Quality<select data-three-quality><option value="auto">Auto</option><option value="low">Low</option><option value="medium">Medium</option><option value="high">High</option></select></label><label class="three-shadow-setting"><input type="checkbox" checked data-three-shadows> Soft ground shadow</label></aside>
+    <span class="three-model-badge">3D · GLTF</span>
+  </div><p class="three-model-caption">Interactive 3D model · {{ product.model_3d_type|upper }}{% if product.models_3d %} · {{ '{:.1f}'.format(product.models_3d[0].file_size / 1048576) }} MB{% endif %}</p></div>
+  <script type="application/json" data-3d-model-data>{{ {"url": product.model_3d_url, "type": product.model_3d_type}|tojson }}</script>
+</div>
+{% else %}
+<div class="product-viewer" data-product-viewer data-product-image="{{ product.image_url }}" data-real-frame-count="{{ rotation_images|length }}">
+  <div class="viewer-modes" role="tablist" aria-label="Product view mode"><button class="viewer-mode is-active" type="button" role="tab" aria-selected="true" data-view-mode="image">Image</button><button class="viewer-mode" type="button" role="tab" aria-selected="false" data-view-mode="spin">360° view</button></div>
+  <div class="viewer-panel image-panel" data-view-panel="image"><img src="{{ product.image_url }}" alt="{{ product.name }}" fetchpriority="high"><button class="image-360-badge" type="button" data-open-spin>↻ 360° view</button></div>
+  <div class="viewer-panel spin-panel" data-view-panel="spin" hidden><div class="spin-stage" data-spin-stage>
+    <canvas class="spin-canvas" width="900" height="900" tabindex="0" role="img" aria-label="Interactive rotating preview of {{ product.name }}" data-spin-canvas></canvas>
+    <div class="spin-hint" data-spin-hint aria-hidden="true"><span>↔</span> Drag to rotate</div><div class="spin-loading" data-spin-loading><span>Preparing product view</span><progress max="100" value="0" data-spin-progress></progress><small data-spin-progress-label>0%</small></div><div class="spin-ready" data-spin-ready hidden>✓ <span data-spin-ready-label>360° ready</span></div><span class="spin-frame-badge" data-spin-badge>360°</span>
+    <div class="spin-controls" aria-label="360 degree viewer controls"><button type="button" data-frame-step="-1" aria-label="Rotate product left">←</button><button type="button" data-auto-rotate aria-pressed="false" aria-label="Start automatic rotation">▶ <span>Auto rotate</span></button><button type="button" data-frame-step="1" aria-label="Rotate product right">→</button><span class="spin-control-divider"></span><button type="button" data-zoom="out" aria-label="Zoom out">−</button><button type="button" data-zoom="in" aria-label="Zoom in">+</button><button type="button" data-fullscreen aria-label="Open viewer fullscreen">⛶</button></div>
+  </div><p class="spin-note" data-spin-note>{{ rotation_images|length }} optimized angles · drag, swipe, or use arrow keys</p></div>
+  <script type="application/json" data-rotation-image-data>{{ rotation_images|tojson }}</script>
+</div>
+{% endif %}
