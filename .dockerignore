@@ -1,0 +1,17 @@
+.git
+.env
+.env.*
+.dev.vars
+.dev.vars.*
+.venv
+venv
+__pycache__/
+**/__pycache__/
+*.py[cod]
+.pytest_cache/
+tests/
+instance/
+logs/
+node_modules/
+cloudflare/worker/node_modules/
+cloudflare/worker/.wrangler/

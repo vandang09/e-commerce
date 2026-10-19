@@ -57,6 +57,23 @@ python -m pytest -q
 
 The tests cover account registration/login, customer-to-admin authorization, and checkout totals/stock changes. The app uses SQLite through SQLAlchemy, so another SQL database can be configured with a compatible `DATABASE_URL` and driver without changing model-level business logic.
 
+## Run with Docker
+
+Install and start Docker Desktop, then create a local environment file and set a unique `SECRET_KEY` in it:
+
+```powershell
+Copy-Item .env.example .env
+```
+
+Build and start the production Waitress container:
+
+```powershell
+docker compose up --build -d
+docker compose ps
+```
+
+Open http://127.0.0.1:5000. The container listens only on the host's loopback interface by default. Set `APP_PORT` in `.env` to use another local port. SQLite data, logs, seller uploads, and uploaded 3D models are stored in named Docker volumes and survive container rebuilds. To stop the app, run `docker compose down`; to also permanently delete its stored data, run `docker compose down --volumes`.
+
 ## Cloudflare Tunnel + Workers VPC
 
 The optional deployment keeps Flask and SQLite on an always-on Windows host. Waitress listens only on loopback; a Cloudflare Tunnel connector on that same host makes the origin privately reachable, and a Cloudflare Worker with a VPC Service binding is the public HTTPS gateway:
