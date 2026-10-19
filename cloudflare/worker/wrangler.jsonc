@@ -1,0 +1,14 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "morrow-market-gateway",
+  "main": "src/index.js",
+  "compatibility_date": "2026-09-30",
+  "workers_dev": true,
+  "vpc_services": [
+    {
+      "binding": "FLASK_ORIGIN",
+      "service_id": "REPLACE_WITH_CLOUDFLARE_VPC_SERVICE_ID",
+      "remote": true
+    }
+  ]
+}

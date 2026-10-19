@@ -3,6 +3,10 @@ __pycache__/
 .venv/
 venv/
 .env
+.dev.vars
+.dev.vars.*
 instance/*.db
 logs/*.log
 .pytest_cache/
+node_modules/
+.wrangler/

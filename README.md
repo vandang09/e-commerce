@@ -56,3 +56,13 @@ python -m pytest -q
 ```
 
 The tests cover account registration/login, customer-to-admin authorization, and checkout totals/stock changes. The app uses SQLite through SQLAlchemy, so another SQL database can be configured with a compatible `DATABASE_URL` and driver without changing model-level business logic.
+
+## Cloudflare Tunnel + Workers VPC
+
+The optional deployment keeps Flask and SQLite on an always-on Windows host. Waitress listens only on loopback; a Cloudflare Tunnel connector on that same host makes the origin privately reachable, and a Cloudflare Worker with a VPC Service binding is the public HTTPS gateway:
+
+```text
+Browser → Worker (workers.dev or your domain) → VPC Service → Tunnel → 127.0.0.1:5000
+```
+
+Follow [cloudflare/worker/README.md](cloudflare/worker/README.md) for the setup. Workers VPC is currently in beta; Cloudflare documents it as available on Workers plans. Creating tunnels and VPC services requires the Cloudflare Connectivity Directory Admin role; binding/deploying requires Connectivity Directory Bind or Admin. Keep the tunnel token, `.env`, and account IDs private.
